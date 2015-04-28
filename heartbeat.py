@@ -1,4 +1,6 @@
 from requests import Session
+import os
+import urlparse
 import json
 import time
 import psycopg2
@@ -35,10 +37,19 @@ if __name__ == '__main__':
     user_id = teamuse['id']
     online = teamuse['online']
     last_seen = teamuse['last_seen']['time']
+    
+    urlparse.uses_netloc.append("postgres")
+    url = urlparse.urlparse(os.environ["DATABASE_URL"])
 
     db_connection = None
     try:
-        db_connection = psycopg2.connect(database='d26tqvcs429mhj', user='uaclvvcazghplm', password='mgreNCm6i4bBI-F7q6ywQfGT3M')
+        db_connection = psycopg2.connect(
+            database=url.path[1:],
+            user=url.username,
+            password=url.password,
+            host=url.hostname,
+            port=url.port
+        )
         cursor = db_connection.cursor()
         cursor.execute(
             "insert into heartbeat " \
