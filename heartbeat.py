@@ -1,6 +1,6 @@
 from requests import Session
+from urllib.parse import urlparse
 import os
-import urlparse
 import json
 import time
 import psycopg2
