@@ -1,5 +1,5 @@
 from requests import Session
-from urllib.parse import urlparse
+from urllib.parse import urlparse, uses_netloc
 import os
 import json
 import time
@@ -38,8 +38,8 @@ if __name__ == '__main__':
     online = teamuse['online']
     last_seen = teamuse['last_seen']['time']
     
-    urlparse.uses_netloc.append("postgres")
-    url = urlparse.urlparse(os.environ["DATABASE_URL"])
+    uses_netloc.append("postgres")
+    url = urlparse(os.environ["DATABASE_URL"])
 
     db_connection = None
     try:
