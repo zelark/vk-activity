@@ -1,1 +1,1 @@
-worker: python heartbeat.py
+clock: python clock.py
