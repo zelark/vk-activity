@@ -1,10 +1,15 @@
 from requests import Session
 from urllib.parse import urlparse, uses_netloc
+from datetime import datetime
 import os
 import json
 import psycopg2
 import sys
 
+
+def current_minute():
+    dt = datetime.now()
+    return dt.hour * 60 + dt.minute
 
 def json_parse(response_text):
     obj = json.loads(response_text)
@@ -28,8 +33,7 @@ def get_user(user_id):
 if __name__ == '__main__':
     user = get_user('zelark')
     user_id = user['id']
-    online = user['online']
-    last_seen = user['last_seen']['time']
+    state = '{{"{}":{}}}'.format(current_minute(), user['online'])
     
     uses_netloc.append("postgres")
     url = urlparse(os.environ["DATABASE_URL"])
@@ -44,11 +48,7 @@ if __name__ == '__main__':
             port=url.port
         )
         cursor = db_connection.cursor()
-        cursor.execute(
-            "insert into heartbeat " \
-            "(user_id, online, last_seen, log_time) " \
-            "values (%s, %s, to_timestamp(%s), 'now');",
-            (user_id, online, last_seen))
+        cursor.execute("select update_activity(%s, %s::json)", (user_id, state))
         db_connection.commit()
     
     except psycopg2.DatabaseError as e:
