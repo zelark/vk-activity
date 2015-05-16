@@ -6,6 +6,6 @@ sched = BlockingScheduler()
 
 @sched.scheduled_job('interval', seconds=60)
 def timed_job():
-    call(['python', 'heartbeat.py'])
+    call(['python', 'vk_activity.py'])
 
 sched.start()

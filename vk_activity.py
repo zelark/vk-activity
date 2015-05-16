@@ -2,41 +2,34 @@ from requests import Session
 from urllib.parse import urlparse, uses_netloc
 import os
 import json
-import time
 import psycopg2
 import sys
 
 
-def unix2human(unixtime):
-    return time.strftime("%a, %d %b %Y %H:%M:%S", time.localtime(unixtime))
-
 def json_parse(response_text):
-    decoder = json.JSONDecoder(strict=False)
-    idx = 0
-    obj, idx = decoder.raw_decode(response_text, idx)
+    obj = json.loads(response_text)
     return obj['response']
 
-def users_get(user_ids):
+def get_user(user_id):
     session = Session()
     session.headers['Accept'] = 'application/json'
     session.headers['Content-Type'] = 'application/x-www-form-urlencoded'
     response = session.post(
         url='http://api.vk.com/method/users.get',
         params={
-            'user_ids': user_ids,
+            'user_ids': user_id,
             'fields': 'online,last_seen',
             'name_case': 'Nom',
             'v': '5.29',
         }
     )
-    return json_parse(response.text)
+    return json_parse(response.text)[0]
 
 if __name__ == '__main__':
-    
-    teamuse = users_get('teamuse')[0]
-    user_id = teamuse['id']
-    online = teamuse['online']
-    last_seen = teamuse['last_seen']['time']
+    user = get_user('zelark')
+    user_id = user['id']
+    online = user['online']
+    last_seen = user['last_seen']['time']
     
     uses_netloc.append("postgres")
     url = urlparse(os.environ["DATABASE_URL"])
