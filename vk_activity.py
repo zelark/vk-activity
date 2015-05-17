@@ -30,7 +30,7 @@ def get_user(user_id):
     )
     return json_parse(response.text)[0]
 
-if __name__ == '__main__':
+def update_activity():
     user = get_user('zelark')
     user_id = user['id']
     state = '{{"{}":{}}}'.format(current_minute(), user['online'])
