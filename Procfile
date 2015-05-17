@@ -1,1 +1,1 @@
-clock: python clock.py
+web: python rest-server.py
