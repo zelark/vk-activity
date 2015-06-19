@@ -31,14 +31,12 @@ def get_users(user_ids):
     return json_parse(response.text)
 
 def update_activity():
-    user = get_users(['zelark'])[0]
-    user_id = user['id']
-    state = '{{"{}":{}}}'.format(current_minute(), user['online'])
-    
+    users = get_users(['zelark'])
+
     uses_netloc.append("postgres")
     url = urlparse(os.environ["DATABASE_URL"])
-
     db_connection = None
+
     try:
         db_connection = psycopg2.connect(
             database=url.path[1:],
@@ -48,7 +46,13 @@ def update_activity():
             port=url.port
         )
         cursor = db_connection.cursor()
-        cursor.execute("select update_activity(%s, %s::json)", (user_id, state))
+
+        for user in users:
+            user_id = user['id']
+            state = '{{"{}":{}}}'.format(current_minute(), user['online'])
+            cursor.execute("select update_activity(%s, %s::json)",
+                (user_id, state))
+        
         db_connection.commit()
     
     except psycopg2.DatabaseError as e:
