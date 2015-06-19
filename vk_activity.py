@@ -52,7 +52,7 @@ def update_activity():
         db_connection.commit()
     
     except psycopg2.DatabaseError as e:
-        print('Error %s' % e)
+        print('Error {}'.foramt(e))
         sys.exit(1)
 
     finally:
