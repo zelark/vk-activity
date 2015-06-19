@@ -15,23 +15,23 @@ def json_parse(response_text):
     obj = json.loads(response_text)
     return obj['response']
 
-def get_user(user_id):
+def get_users(user_ids):
     session = Session()
     session.headers['Accept'] = 'application/json'
     session.headers['Content-Type'] = 'application/x-www-form-urlencoded'
     response = session.post(
         url='http://api.vk.com/method/users.get',
         params={
-            'user_ids': user_id,
+            'user_ids': ','.join(user_ids),
             'fields': 'online,last_seen',
             'name_case': 'Nom',
             'v': '5.29',
         }
     )
-    return json_parse(response.text)[0]
+    return json_parse(response.text)
 
 def update_activity():
-    user = get_user('zelark')
+    user = get_users(['zelark'])[0]
     user_id = user['id']
     state = '{{"{}":{}}}'.format(current_minute(), user['online'])
     
