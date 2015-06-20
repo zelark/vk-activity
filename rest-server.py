@@ -4,7 +4,6 @@ from flask.ext.restful import reqparse
 from urllib.parse import urlparse, uses_netloc
 from apscheduler.schedulers.background import BackgroundScheduler
 from vk_activity import update_activity 
-from vk_activity import get_user, json_parse, current_minute
 import os
 import psycopg2
 
