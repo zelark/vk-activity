@@ -1,4 +1,5 @@
-from flask import Flask
+from flask import Flask, request 
+from flask import render_template, url_for
 from flask.ext.restful import Api, Resource
 from flask.ext.restful import reqparse
 from urllib.parse import urlparse, uses_netloc
@@ -8,9 +9,8 @@ import os
 import psycopg2
 
 
-app = Flask(__name__, static_url_path='')
+app = Flask(__name__)
 api = Api(app)
-
 
 scheduler = BackgroundScheduler()
 scheduler.add_job(update_activity, 'interval', seconds=60)
@@ -18,12 +18,19 @@ scheduler.start()
 print('scheduler is running...')
 
 @app.route('/')
-def root():
-    return app.send_static_file('heartbeat.html')
+def index():
+    return 'this is root'
+
+@app.route('/<username>')
+@app.route('/<int:username>')
+def get_user_activity(username):
+    return render_template('heartbeat.html')
 
 class UserAPI(Resource):
     def get(self, id):
 
+        date = request.args.get('date', None)
+        print("Date: {}".format(date))
         uses_netloc.append("postgres")
         url = urlparse(os.environ["DATABASE_URL"])
 
@@ -40,7 +47,10 @@ class UserAPI(Resource):
                 port=url.port
             )
             cursor = db_connection.cursor()
-            cursor.execute("select current_state(%s)", (id,))
+            if not date:
+                cursor.execute("select current_state(%s)", (id,))
+            else:
+                cursor.execute("select current_state(%s, ''%s''::date)", (id, date))
             response = cursor.fetchone()[0]
             db_connection.commit()
         except psycopg2.DatabaseError as e:
