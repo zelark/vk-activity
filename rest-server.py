@@ -1,6 +1,6 @@
 from flask import Flask, request 
 from flask import render_template, url_for
-from flask.ext.restful import Api, Resource
+from flask.ext.restful import Api, Resource, reqparse, inputs
 from flask.ext.restful import reqparse
 from urllib.parse import urlparse, uses_netloc
 from apscheduler.schedulers.background import BackgroundScheduler
@@ -19,7 +19,7 @@ print('scheduler is running...')
 
 @app.route('/')
 def index():
-    return 'this is root'
+    return 'an example: http://hostname/[user_id]?date=YYYY-MM-DD'
 
 @app.route('/<username>')
 @app.route('/<int:username>')
@@ -27,16 +27,23 @@ def get_user_activity(username):
     return render_template('heartbeat.html')
 
 class UserAPI(Resource):
-    def get(self, id):
 
-        date = request.args.get('date', None)
-        print("Date: {}".format(date))
+    def __init__(self):
+        self.reqparse = reqparse.RequestParser()
+        self.reqparse.add_argument('date', type=inputs.date)
+
+        super(UserAPI, self).__init__()
+
+    def get(self, id):
+        args = self.reqparse.parse_args()
+        date = args['date']
+        if date:
+            date = date.strftime('%Y%m%d')
+
         uses_netloc.append("postgres")
         url = urlparse(os.environ["DATABASE_URL"])
 
-        # todo: make jsonify response
         response = None
-
         db_connection = None
         try:
             db_connection = psycopg2.connect(
@@ -50,16 +57,21 @@ class UserAPI(Resource):
             if not date:
                 cursor.execute("select current_state(%s)", (id,))
             else:
-                cursor.execute("select current_state(%s, ''%s''::date)", (id, date))
+                cursor.execute("select current_state(%s, %s::date)", (id, date))
             response = cursor.fetchone()[0]
             db_connection.commit()
+
         except psycopg2.DatabaseError as e:
-            print('Error %s' % e)
+            print('Error: {}'.format(e))
             sys.exit(1)
+
         finally:
             if db_connection:
                 db_connection.close()
 
-        return response, 200
+        if response:
+            return response, 200
+        else:
+            return {'error': 'Not found'}, 404
 
 api.add_resource(UserAPI, '/vk/activity/v1.0/users/<int:id>', endpoint='user')
