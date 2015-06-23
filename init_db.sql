@@ -1,3 +1,8 @@
+create table vk_users (
+    user_id numeric,
+    name text
+  );
+
 create table vk_activity (
     user_id numeric,
     log_date date,

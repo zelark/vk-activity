@@ -31,7 +31,6 @@ def get_users(user_ids):
     return json_parse(response.text)
 
 def update_activity():
-    users = get_users(['zelark'])
 
     uses_netloc.append("postgres")
     url = urlparse(os.environ["DATABASE_URL"])
@@ -46,6 +45,9 @@ def update_activity():
             port=url.port
         )
         cursor = db_connection.cursor()
+        cursor.execute("select user_id from vk_users")
+        user_ids = [str(user_id[0]) for user_id in cursor.fetchall()]
+        users = get_users(user_ids)
 
         for user in users:
             user_id = user['id']
