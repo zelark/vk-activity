@@ -30,7 +30,7 @@ class UserAPI(Resource):
 
     def __init__(self):
         self.reqparse = reqparse.RequestParser()
-        self.reqparse.add_argument('date', type=inputs.date)
+        self.reqparse.add_argument('date', type=inputs.date, location='values')
 
         super(UserAPI, self).__init__()
 
