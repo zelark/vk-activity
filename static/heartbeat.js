@@ -1,7 +1,7 @@
 $(document).ready(function() {
-    
+
     var QueryString = function() {
-        // This function is anonymous, is executed immediately and 
+        // This function is anonymous, is executed immediately and
         // the return value is assigned to QueryString!
         var query_string = {};
         var query = window.location.search.substring(1);
@@ -19,27 +19,27 @@ $(document).ready(function() {
             } else {
                 query_string[pair[0]].push(pair[1]);
             }
-        } 
+        }
         return query_string;
     }();
 
-    function draw_minutes() {
+    var getClassName = function(online) {
+        var className = 'vminute_null';
+        if (online == 1) {
+            className = 'vminute_online';
+        } else if (online == 0) {
+            className = 'vminute_offline';
+        }
+        return className;
+    };
+
+    var drawMinutes = function() {
 
         var mpc = 120; // minutes per cycle
         var shift_angle = 300 / 120.0
         var base_radius = 200;
         var base_shift = -90 + (shift_angle + 10) / 2;
         var deg_indent = 0;
-
-        var pathname = window.location.pathname.split('/');
-        var user_id = pathname[pathname.length - 1];
-
-        if (typeof QueryString.date != 'undefined') {
-            self.userURI = 'http://' + window.location.host + '/vk/activity/v1.0/users/' + user_id + '?date=' + QueryString.date;
-
-        } else {
-            self.userURI = 'http://' + window.location.host + '/vk/activity/v1.0/users/' + user_id;
-        }
 
         // create all minutes
         for (var i = 0; i < 12; i++) {
@@ -49,7 +49,6 @@ $(document).ready(function() {
         }
 
         $('div.vminute').each(function(index) {
-
             if (index % 120 === 0) {
                 deg_indent = 0;
             } else if (index % 60 == 0) {
@@ -67,42 +66,49 @@ $(document).ready(function() {
             }
 
             $(this).css({transform: 'rotate(' + degree + 'deg) translate(' + radius + 'px)'});
-
         });
-
-        self.ajax = function(uri, method, data) {
-            var request = {
-                url: uri,
-                type: method,
-                contentType: "application/json",
-                accepts: "application/json",
-                cache: false,
-                dataType: 'json',
-                data: JSON.stringify(data),
-                error: function(jqXHR) {
-                    console.log("ajax error " + jqXHR.status);
-                }
-            };
-            return $.ajax(request);
-        }
-
-        function getClassName(online) {
-            var className = 'vminute_null';
-            if (online == 1) {
-                className = 'vminute_online';
-            } else if (online == 0) {
-                className = 'vminute_offline';
-            }
-            return className;
-        }
-
-        self.ajax(self.userURI, 'GET').done(function(minutes) {
-            for (var minute in minutes) {
-               $("#" + minute).attr('class', getClassName(minutes[minute]))
-            }
-        });
-
     };
 
-    draw_minutes();
+    drawMinutes();
+
+    var pathname = window.location.pathname.split('/');
+    var user_id = pathname[pathname.length - 1];
+
+    if (typeof QueryString.date != 'undefined') {
+        userURI = 'http://' + window.location.host
+            + '/vk/activity/v1.0/users/' + user_id
+            + '?date=' + QueryString.date;
+    } else {
+        userURI = 'http://' + window.location.host
+            + '/vk/activity/v1.0/users/' + user_id;
+    }
+
+    var ajax = function(uri, method, data) {
+        var request = {
+            url: uri,
+            type: method,
+            contentType: "application/json",
+            accepts: "application/json",
+            cache: false,
+            dataType: 'json',
+            data: JSON.stringify(data),
+            error: function(jqXHR) {
+                console.log("ajax error " + jqXHR.status);
+            }
+        };
+        return $.ajax(request);
+    };
+
+    var render = function(minutes) {
+        for (var minute in minutes) {
+            $("#" + minute).attr('class', getClassName(minutes[minute]));
+        }
+    };
+
+    var update = function() {
+        ajax(userURI, 'GET').done(render)
+    };
+
+    update();
+
 });
