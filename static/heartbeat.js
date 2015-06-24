@@ -110,5 +110,6 @@ $(document).ready(function() {
     };
 
     update();
+    setInterval(update, 60 * 1000);
 
 });
