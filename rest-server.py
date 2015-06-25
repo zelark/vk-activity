@@ -34,7 +34,7 @@ class UserAPI(Resource):
 
         super(UserAPI, self).__init__()
 
-    def get(self, id):
+    def get(self, user_id):
         args = self.reqparse.parse_args()
         date = args['date']
         if date:
@@ -55,9 +55,9 @@ class UserAPI(Resource):
             )
             cursor = db_connection.cursor()
             if not date:
-                cursor.execute("select current_state(%s)", (id,))
+                cursor.execute("select current_state(%s)", (user_id,))
             else:
-                cursor.execute("select current_state(%s, %s::date)", (id, date))
+                cursor.execute("select current_state(%s, %s::date)", (user_id, date))
             response = cursor.fetchone()[0]
             db_connection.commit()
 
@@ -74,4 +74,8 @@ class UserAPI(Resource):
         else:
             return {'error': 'Not found'}, 404
 
-api.add_resource(UserAPI, '/vk/activity/v1.0/users/<int:id>', endpoint='user')
+
+api.add_resource(UserAPI,
+                 '/vk/activity/v1.0/users/<int:user_id>',
+                 '/vk/activity/v1.0/users/<user_id>',
+                 endpoint='user')

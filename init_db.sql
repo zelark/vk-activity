@@ -23,6 +23,20 @@ as $$
   where user_id = i_user_id
     and log_date = i_log_date;
 $$ language sql immutable;
+
+-- get current state by name
+create or replace function current_state(
+  i_name text,
+  i_log_date date default current_date
+) returns jsonb
+as $$
+  select act.state
+  from vk_activity act
+    join vk_users usr
+      on (usr.user_id = act.user_id)
+  where usr.name = i_name
+    and act.log_date = i_log_date;
+$$ language sql immutable;
  
 -- get the current minute (not used)
 create or replace function current_minute(dt interval default '3 hours')
