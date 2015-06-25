@@ -76,6 +76,6 @@ class UserAPI(Resource):
 
 
 api.add_resource(UserAPI,
-                 '/vk/activity/v1.0/users/<int:user_id>',
+                 '/vk/activity/v1.0/users/id<int:user_id>',
                  '/vk/activity/v1.0/users/<user_id>',
                  endpoint='user')
