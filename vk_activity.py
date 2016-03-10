@@ -1,5 +1,4 @@
 from requests import Session
-from urllib.parse import urlparse, uses_netloc
 from datetime import datetime
 import os
 import json
@@ -7,15 +6,29 @@ import psycopg2
 import sys
 
 
-def current_minute():
-    dt = datetime.now()
-    return dt.hour * 60 + dt.minute
+def update_activity():
+    db_url = os.environ["DATABASE_URL"]
+    db = psycopg2.connect(db_url)
 
-def json_parse(response_text):
-    obj = json.loads(response_text)
-    return obj['response']
+    with db:
+        with db.cursor() as cursor:
+            cursor.execute("select user_id from vk_users")
+            user_ids = [str(user_id[0]) for user_id in cursor.fetchall()]
+    users = get_vk_users(user_ids)
+    current_minute = get_current_minute()
 
-def get_users(user_ids):
+    for user in users:
+        user_id = user['id']
+        state = '{{"{}":{}}}'.format(current_minute, user['online'])
+        print(user_id, state) 
+        with db:
+            with db.cursor() as cursor:
+                cursor.execute("select update_activity(%s, %s::json)", (user_id, state))
+        
+    if db:
+        db.close()
+
+def get_vk_users(user_ids):
     session = Session()
     session.headers['Accept'] = 'application/json'
     session.headers['Content-Type'] = 'application/x-www-form-urlencoded'
@@ -30,37 +43,14 @@ def get_users(user_ids):
     )
     return json_parse(response.text)
 
-def update_activity():
+def json_parse(response_text):
+    obj = json.loads(response_text)
+    return obj['response']
 
-    uses_netloc.append("postgres")
-    url = urlparse(os.environ["DATABASE_URL"])
-    db_connection = None
+def get_current_minute():
+    dt = datetime.now()
+    return dt.hour * 60 + dt.minute
 
-    try:
-        db_connection = psycopg2.connect(
-            database=url.path[1:],
-            user=url.username,
-            password=url.password,
-            host=url.hostname,
-            port=url.port
-        )
-        cursor = db_connection.cursor()
-        cursor.execute("select user_id from vk_users")
-        user_ids = [str(user_id[0]) for user_id in cursor.fetchall()]
-        users = get_users(user_ids)
 
-        for user in users:
-            user_id = user['id']
-            state = '{{"{}":{}}}'.format(current_minute(), user['online'])
-            cursor.execute("select update_activity(%s, %s::json)",
-                (user_id, state))
-        
-        db_connection.commit()
-    
-    except psycopg2.DatabaseError as e:
-        print('Error {}'.format(e))
-        sys.exit(1)
-
-    finally:
-        if db_connection:
-            db_connection.close()
+if __name__ == '__main__':
+    update_activity()
