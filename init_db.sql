@@ -1,16 +1,18 @@
-create table vk_users (
+create table if not exists 
+  vk_users (
     user_id numeric,
     name text
   );
 
-create table vk_activity (
+create table if not exists
+  vk_activity (
     user_id numeric,
     log_date date,
     state jsonb
   );
 
 -- alter timezone on a database
-alter role your_user set timezone = 'Europe/Moscow';
+alter role {{user-role}} set timezone = 'Europe/Moscow';
  
 -- get current state by user
 create or replace function current_state(
