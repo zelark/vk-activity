@@ -18,10 +18,10 @@ uses_netloc.append("postgres")
 db_url = urlparse(os.environ["DATABASE_URL"])
 
 
-#scheduler = BackgroundScheduler()
-#scheduler.add_job(update_activity, 'interval', seconds=60)
-#scheduler.start()
-#print('scheduler is running...')
+scheduler = BackgroundScheduler()
+scheduler.add_job(update_activity, 'interval', seconds=60)
+scheduler.start()
+print('scheduler is running...')
 
 
 def get_db():
