@@ -1,48 +1,26 @@
-.vminute {
+.vmin {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    margin: auto;
+}
+
+.none {
     width: 5px;
     height: 1px;
     background: gray;
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    margin: auto;
 }
 
-.vminute_online {
+.on {
     width: 5px;
     height: 5px;
     background: #4d7198;
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    margin: auto;
 }
 
-.vminute_offline {
+.off {
     width: 3px;
     height: 3px;
     background: gray;
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    margin: auto;
-}
-
-.vminute_null {
-    width: 3px;
-    height: 3px;
-    background: white;
-    border: 1px solid gray;
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    margin: auto;
 }

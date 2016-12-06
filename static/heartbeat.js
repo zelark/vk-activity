@@ -23,16 +23,6 @@ $(document).ready(function() {
         return query_string;
     }();
 
-    var getClassName = function(online) {
-        var className = 'vminute_null';
-        if (online == 1) {
-            className = 'vminute_online';
-        } else if (online == 0) {
-            className = 'vminute_offline';
-        }
-        return className;
-    };
-
     var drawMinutes = function() {
 
         var mpc = 120; // minutes per cycle
@@ -44,11 +34,11 @@ $(document).ready(function() {
         // create all minutes
         for (var i = 0; i < 12; i++) {
             for (var j = 0; j < mpc; j++) {
-                $('.vday').append('<div id="' + (i * mpc + j) + '" class="vminute"></div>');
+                $('.vday').append('<div id="' + (i * mpc + j) + '" class="vmin none"></div>');
             }
         }
 
-        $('div.vminute').each(function(index) {
+        $('div.vmin').each(function(index) {
             if (index % 120 === 0) {
                 deg_indent = 0;
             } else if (index % 60 == 0) {
@@ -101,8 +91,20 @@ $(document).ready(function() {
 
     var render = function(minutes) {
         for (var minute in minutes) {
-            $("#" + minute).attr('class', getClassName(minutes[minute]));
+            $("#" + minute).attr('class', 'vmin');
+            $("#" + minute).addClass(getClassName(minutes[minute]));
         }
+    };
+
+    var getClassName = function(online) {
+        var className = 'none';
+        if (online == 1) {
+            className = 'on';
+        }
+        else if (online == 0) {
+            className = 'off';
+        }
+        return className;
     };
 
     var update = function() {
