@@ -75,6 +75,9 @@ $(document).ready(function() {
         else if (online == 0) {
             className = 'off';
         }
+        else if (online == 2) {
+            className = 'checkpoint';
+        };
         return className;
     };
 

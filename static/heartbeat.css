@@ -19,6 +19,13 @@
     background: #4d7198;
 }
 
+.checkpoint {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #4d7198;
+}
+
 .off {
     width: 3px;
     height: 3px;
