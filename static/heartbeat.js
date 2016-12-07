@@ -23,14 +23,14 @@ var drawMinutes = function() {
     var deg_indent = 0;
 
     // create all minutes
-    $('.vday').empty();
+    $('#activity').empty();
     for (var i = 0; i < 12; i++) {
         for (var j = 0; j < mpc; j++) {
-            $('.vday').append('<div id="' + (i * mpc + j) + '" class="vmin none"></div>');
+            $('#activity').append('<div id="' + (i * mpc + j) + '" class="none"></div>');
         }
     }
 
-    $('div.vmin').each(function(index) {
+    $('#activity > div').each(function(index) {
         if (index % 120 === 0) {
             deg_indent = 0;
         } else if (index % 60 == 0) {
@@ -62,7 +62,7 @@ $(document).ready(function() {
 
     var render = function(minutes) {
         for (var minute in minutes) {
-            $("#" + minute).attr('class', 'vmin');
+            $("#" + minute).removeClass();
             $("#" + minute).addClass(getClassName(minutes[minute]));
         }
     };
